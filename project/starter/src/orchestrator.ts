@@ -93,7 +93,7 @@ Pull request: #{prNumber}
          options: {
            model: process.env.ANTHROPIC_MODEL,
            cwd: process.env.PROJECT_ROOT  || process.cwd(),
-           pathToClaudeCodeExecutable: ' /usr/local/share/nvm/version/node/v24.21.0/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe',
+           pathToClaudeCodeExecutable: '/home/codespace/.local/bin/claude',
             mcpServers: mcpServersConfig,
             agents: {
                codeQualityAnalyzer,
