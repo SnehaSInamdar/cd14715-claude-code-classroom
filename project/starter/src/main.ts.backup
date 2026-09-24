@@ -58,14 +58,6 @@ async function main() {
     process.exit(1);
   }
 
-  if (!process.env.GITHUB_TOKEN) {
-  console.error('Error: GITHUB_TOKEN environment variable is required for GitHub MCP');
-  console.error('Create a GitHub personal access token with repo/read access.');
-  process.exit(1);
-}
- 
-
-
   console.log(`Reviewing PR #${prNumber} for ${owner}/${repo}....`);
 
   try {
@@ -89,16 +81,23 @@ async function main() {
 
   const baseName = `${owner}_${repo}_${prNumber}`;
 
-  fs.writeFileSync(path.join(reportsDir, `${baseName}.json`), jsonReport, 'utf-8');
+  fs.writeFileSync(
+    path.join(reportsDir, `${baseName}.json`),
+    jsonReport,
+    'utf-8',
+  );
 
-  fs.writeFileSync(path.join(reportsDir, `${baseName}.md`), markdownReport, 'utf-8');
-  
-  fs.writeFileSync(path.join(reportsDir, `${baseName}.html`), htmlReport, 'utf-8' );
+  fs.writeFileSync(
+    path.join(reportsDir, `${baseName}.md`),
+    markdownReport,
+    'utf-8',
+  );
 
-  // Canonical report filenames
-  fs.writeFileSync(path.join(reportsDir, 'report.json'), jsonReport, 'utf-8');
-  fs.writeFileSync(path.join(reportsDir, 'report.md'), markdownReport, 'utf-8');
-  fs.writeFileSync(path.join(reportsDir, 'report.html'), htmlReport, 'utf-8');
+  fs.writeFileSync(
+    path.join(reportsDir, `${baseName}.html`),
+    htmlReport,
+    'utf-8',
+  );
 
   console.log('\nReview complete. Reports saved:');
   console.log(`JSON: reports/${baseName},json`);

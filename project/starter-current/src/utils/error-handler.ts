@@ -1,6 +1,3 @@
-import { resolve } from "path";
-import { number } from "zod/v4";
-
 /**
  * Custom error class for review operations
  */
@@ -70,39 +67,18 @@ export async function withRetry<T>(
   maxRetries: number = 3,
   delayMs: number = 1000
 ): Promise<T> {
-  let lastError: unknown;
+  // TODO: Implement retry logic with exponential backoff
+  // Hints:
+  // - Use a for loop from 1 to maxRetries
+  // - Use try/catch to catch errors
+  // - Calculate backoff: delayMs * Math.pow(2, attempt - 1)
+  // - Add jitter: Math.random() * 100
+  // - Use setTimeout wrapped in Promise for delay
+  // - Throw ReviewError with ErrorCodes.RETRY_EXHAUSTED if all retries fail
 
-  for(let attempt = 1; attempt <= maxRetries + 1; attempt++) {
-    try{
-      return await fn();
-    } catch (error) {
-      lastError = error;
-
-      if (attempt > maxRetries) {
-        break;
-      }
-
-      const backoff = delayMs * Math.pow(2, attempt - 1);
-      const jitter = Math.random() * 100;
-      const waitTime = backoff + jitter;
-
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, waitTime);
-      });
-    }
-  }
-
-  throw new ReviewError(
-    `Retry exhausted: ${
-      lastError instanceof Error ? lastError.message : String(lastError)
-    }`,
-    ErrorCodes.RETRY_EXHAUSTED,
-    { maxRetries },
-  );
+  throw new Error('Not implemented');
 }
 
-
-  
 /**
  * Wrap an async function with timeout
  *
@@ -118,24 +94,17 @@ export async function withRetry<T>(
 export async function withTimeout<T>(
   fn: () => Promise<T>,
   timeoutMs: number,
-  errorMessage: string = 'Operation timed out',
+  errorMessage: string = 'Operation timed out'
 ): Promise<T> {
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    setTimeout(() => {
-      reject(
-        new ReviewError(
-          errorMessage,
-          ErrorCodes.AGENT_TIMEOUT,
-          { timeoutMs },
-        ),
-      ); 
-    }, timeoutMs);
-  });
-  return Promise.race([fn(), timeoutPromise]);
-}
-  
+  // TODO: Implement timeout wrapper using Promise.race
+  // Hints:
+  // - Use Promise.race to race fn() against a timeout promise
+  // - The timeout promise should reject after timeoutMs milliseconds
+  // - Throw ReviewError with ErrorCodes.AGENT_TIMEOUT on timeout
+  // - Include timeoutMs in metadata
 
-  
+  throw new Error('Not implemented');
+}
 
 /**
  * Check if an error is a ReviewError
