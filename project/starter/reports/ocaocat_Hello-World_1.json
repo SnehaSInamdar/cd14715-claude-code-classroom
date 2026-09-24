@@ -1,0 +1,32 @@
+{
+  "pullRequest": {
+    "owner": "ocaocat",
+    "repo": "Hello-World",
+    "number": 1
+  },
+  "fileReviews": [],
+  "summary": {
+    "totalFiles": 0,
+    "overallScore": 0,
+    "criticalIssues": 0,
+    "highPriorityTests": 0,
+    "refactoringOpportunities": 0
+  },
+  "recommendations": [
+    {
+      "priority": "critical",
+      "category": "Authentication",
+      "description": "Unable to access GitHub pull request data due to authentication failure. The GitHub MCP server requires valid credentials to fetch PR #1 from octocat/Hello-World repository. Please configure GitHub authentication tokens or grant permissions to access the GitHub API.",
+      "files": []
+    }
+  ],
+  "metadata": {
+    "analyzedAt": "2026-09-20T00:00:00Z",
+    "duration": 52172,
+    "agentVersions": {
+      "codeQualityAnalyzer": "not-executed",
+      "testCoverageAnalyzer": "not-executed",
+      "refactoringSuggester": "not-executed"
+    }
+  }
+}

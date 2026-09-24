@@ -1,0 +1,32 @@
+{
+  "pullRequest": {
+    "owner": "airaamane",
+    "repo": "simple-todo-app",
+    "number": 2
+  },
+  "fileReviews": [],
+  "summary": {
+    "totalFiles": 0,
+    "overallScore": 0,
+    "criticalIssues": 0,
+    "highPriorityTests": 0,
+    "refactoringOpportunities": 0
+  },
+  "recommendations": [
+    {
+      "priority": "critical",
+      "category": "Access Error",
+      "description": "Unable to access the pull request. The repository 'airaamane/simple-todo-app' PR #2 returned 'Not Found'. This could be because: (1) The repository is private and requires authentication, (2) The repository or PR does not exist, or (3) The GitHub token does not have sufficient permissions. Please verify the repository exists, is accessible, and that proper authentication is configured.",
+      "files": []
+    }
+  ],
+  "metadata": {
+    "analyzedAt": "2026-09-20T00:00:00Z",
+    "duration": 37044,
+    "agentVersions": {
+      "codeQualityAnalyzer": "not-executed",
+      "testCoverageAnalyzer": "not-executed",
+      "refactoringSuggester": "not-executed"
+    }
+  }
+}

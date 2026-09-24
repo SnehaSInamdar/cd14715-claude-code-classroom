@@ -1,0 +1,32 @@
+{
+  "pullRequest": {
+    "owner": "octocet",
+    "repo": "Hello-World",
+    "number": 1
+  },
+  "fileReviews": [],
+  "summary": {
+    "totalFiles": 0,
+    "overallScore": 0,
+    "criticalIssues": 0,
+    "highPriorityTests": 0,
+    "refactoringOpportunities": 0
+  },
+  "recommendations": [
+    {
+      "priority": "critical",
+      "category": "Access Error",
+      "description": "Unable to access the pull request at octocet/Hello-World #1. The repository may not exist, may be private, or the owner name may be incorrect (possibly 'octocat' instead of 'octocet'). Please verify the repository details and ensure proper access credentials are configured.",
+      "files": []
+    }
+  ],
+  "metadata": {
+    "analyzedAt": "2026-09-18T00:00:00Z",
+    "duration": 55324,
+    "agentVersions": {
+      "codeQualityAnalyzer": "not-run",
+      "testCoverageAnalyzer": "not-run",
+      "refactoringSuggester": "not-run"
+    }
+  }
+}
