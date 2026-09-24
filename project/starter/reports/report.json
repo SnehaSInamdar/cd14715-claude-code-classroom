@@ -1,0 +1,278 @@
+{
+  "pullRequest": {
+    "owner": "lucaong",
+    "repo": "minisearch",
+    "number": 305
+  },
+  "fileReviews": [
+    {
+      "file": "src/MiniSearch.ts",
+      "codeQuality": {
+        "file": "src/MiniSearch.ts",
+        "issues": [
+          {
+            "line": 1710,
+            "severity": "medium",
+            "category": "performance",
+            "description": "Filter function may be called multiple times for the same document in nested query scenarios, potentially impacting performance for expensive filter operations",
+            "suggestion": "Consider caching filter results per document ID, or clearly document this behavior for users who may have expensive filter functions"
+          },
+          {
+            "line": 1706,
+            "severity": "low",
+            "category": "maintainability",
+            "description": "Filter option is explicitly set to undefined in the options spread, which may be confusing to future maintainers",
+            "suggestion": "Add a code comment explaining why filter needs to be excluded from subquery options to prevent it from being passed down incorrectly"
+          },
+          {
+            "line": 1959,
+            "severity": "info",
+            "category": "best-practice",
+            "description": "Excellent refactoring: The new makeResult() method successfully extracts result creation logic, improving code organization and reducing duplication",
+            "suggestion": "This is a positive change that improves maintainability. Consider applying similar extraction patterns to other complex methods in the codebase"
+          },
+          {
+            "line": 1710,
+            "severity": "low",
+            "category": "maintainability",
+            "description": "Filter application logic is duplicated between the search() method and executeQuerySpec() method",
+            "suggestion": "Consider extracting the filter application pattern into a private helper method to reduce duplication and improve maintainability"
+          }
+        ],
+        "overallScore": 80,
+        "summary": "Code quality is good overall. The makeResult() extraction is a solid refactoring that improves maintainability. Main concerns are around potential performance impact with multiple filter calls in nested queries and some code clarity issues around filter option handling. No critical security or bug-risk issues identified."
+      },
+      "testCoverage": {
+        "file": "src/MiniSearch.ts",
+        "hasTests": true,
+        "testFiles": [
+          "src/MiniSearch.test.js"
+        ],
+        "untestedPaths": [
+          {
+            "type": "branch",
+            "location": "executeQuerySpec() - filter application at QueryCombination level (lines 1706-1715)",
+            "priority": "critical",
+            "reasoning": "The new filter logic at QueryCombination level is the core feature of this PR. It needs comprehensive testing with various edge cases including nested queries with filters at multiple levels.",
+            "suggestedTest": "Add test cases for: nested queries with filters at parent and child levels, empty filter results, filter composition with different combineWith operators (OR, AND, AND_NOT)"
+          },
+          {
+            "type": "function",
+            "location": "makeResult() private method (lines 1959-1976)",
+            "priority": "high",
+            "reasoning": "This new private method handles result object creation and quality calculation. While it's tested indirectly through search(), edge cases in result creation aren't explicitly covered.",
+            "suggestedTest": "Add integration tests that verify result structure with edge cases: documents with missing stored fields, empty terms arrays, null/undefined values in match objects"
+          },
+          {
+            "type": "edge-case",
+            "location": "Filter function receiving different scores at different query levels",
+            "priority": "critical",
+            "reasoning": "The PR description explicitly mentions that scores may differ at executeQuerySpec() level vs search() top-level, which could affect filter behavior if users filter on score values",
+            "suggestedTest": "Add test case with a filter function that depends on score values to verify and document the expected behavior across different query levels"
+          },
+          {
+            "type": "edge-case",
+            "location": "Filter function error handling",
+            "priority": "high",
+            "reasoning": "No tests verify what happens when a user-provided filter function throws an error during execution",
+            "suggestedTest": "Test that filter function exceptions are propagated correctly and don't leave the search in an inconsistent state"
+          },
+          {
+            "type": "branch",
+            "location": "Filter with undefined/null checks",
+            "priority": "medium",
+            "reasoning": "The code checks for filter == null but edge cases around undefined filters in sub-queries aren't explicitly tested",
+            "suggestedTest": "Test sub-queries with undefined filter, null filter, and missing filter property to ensure all are handled correctly"
+          }
+        ],
+        "coverageEstimate": 65,
+        "summary": "A basic test case was added for nested query filtering, but several critical code paths and edge cases remain untested. The new functionality needs more comprehensive test coverage, particularly around filter composition at multiple query levels and the score discrepancy issue mentioned in the PR description."
+      },
+      "refactorings": {
+        "file": "src/MiniSearch.ts",
+        "suggestions": [
+          {
+            "type": "extract-function",
+            "location": "Filter application logic in executeQuerySpec() and search()",
+            "impact": "medium",
+            "description": "Extract the filter application logic into a reusable private method to eliminate duplication",
+            "before": "for (const [docId, rawValue] of combined) {\n  const result = this.makeResult(docId, rawValue)\n  if (!options.filter(result)) combined.delete(docId)\n}",
+            "after": "private applyFilter(results: Map<number, RawResultValue>, filter: (result: SearchResult) => boolean): void {\n  for (const [docId, rawValue] of results) {\n    if (!filter(this.makeResult(docId, rawValue))) {\n      results.delete(docId)\n    }\n  }\n}",
+            "benefits": "Reduces code duplication between search() and executeQuerySpec(), improves testability by isolating filter logic, makes the code more maintainable"
+          },
+          {
+            "type": "simplify",
+            "location": "Filter null check pattern (line 1389)",
+            "impact": "low",
+            "description": "Simplify the null check for filter to be more concise",
+            "before": "if (searchOptionsWithDefaults.filter == null || searchOptionsWithDefaults.filter(result))",
+            "after": "if (!searchOptionsWithDefaults.filter || searchOptionsWithDefaults.filter(result))",
+            "benefits": "More concise and idiomatic JavaScript null checking, slightly more readable"
+          },
+          {
+            "type": "pattern-improvement",
+            "location": "Options destructuring in executeQuerySpec (line 1705)",
+            "impact": "low",
+            "description": "Add a comment to clarify why filter is explicitly set to undefined",
+            "before": "const options = { ...searchOptions, filter: undefined, ...query, queries: undefined }",
+            "after": "// Exclude filter from inherited options - it's applied at QueryCombination level\nconst options = { ...searchOptions, filter: undefined, ...query, queries: undefined }",
+            "benefits": "Improves code clarity and helps future maintainers understand the intentional exclusion of the filter option"
+          }
+        ],
+        "summary": "The makeResult() extraction is an excellent refactoring that improves code organization. Additional opportunities exist to reduce duplication in filter application logic and improve code clarity through better comments."
+      }
+    },
+    {
+      "file": "src/MiniSearch.test.js",
+      "codeQuality": {
+        "file": "src/MiniSearch.test.js",
+        "issues": [
+          {
+            "line": 1389,
+            "severity": "info",
+            "category": "best-practice",
+            "description": "Good improvement: Changed 'let reference' to 'const reference' for a variable that is never reassigned",
+            "suggestion": "Continue using const for variables that aren't reassigned throughout the test suite to prevent accidental mutations"
+          },
+          {
+            "line": 1876,
+            "severity": "info",
+            "category": "style",
+            "description": "Removed unnecessary blank lines, improving code consistency",
+            "suggestion": "Continue maintaining consistent whitespace formatting throughout the test file"
+          }
+        ],
+        "overallScore": 85,
+        "summary": "Test code quality is good with minor style improvements including better const usage and whitespace cleanup. The new test case follows existing patterns and is well-structured."
+      },
+      "testCoverage": {
+        "file": "src/MiniSearch.test.js",
+        "hasTests": true,
+        "testFiles": [
+          "src/MiniSearch.test.js"
+        ],
+        "untestedPaths": [
+          {
+            "type": "edge-case",
+            "location": "New test case 'allows custom filtering of results in complex queries' (lines 1254-1269)",
+            "priority": "critical",
+            "reasoning": "The test only covers the happy path with two sub-queries returning expected results. It doesn't test edge cases like empty filter results, conflicting filters, deeply nested queries, or error conditions.",
+            "suggestedTest": "Expand test coverage with: 1) filters that exclude all results, 2) filters at multiple nesting levels, 3) interaction between filters and combineWith operators (AND, OR, AND_NOT), 4) filters accessing undefined stored fields"
+          },
+          {
+            "type": "edge-case",
+            "location": "Filter function error handling",
+            "priority": "high",
+            "reasoning": "No test verifies the behavior when a filter function throws an error during execution",
+            "suggestedTest": "Add test: it('should propagate filter function errors', () => { expect(() => ms.search({ queries: [{ queries: ['del'], filter: () => { throw new Error('test') } }] })).toThrow() })"
+          },
+          {
+            "type": "edge-case",
+            "location": "Filter returning all false",
+            "priority": "high",
+            "reasoning": "No test verifies behavior when filter excludes all matching documents",
+            "suggestedTest": "Add test: it('should return empty array when filter excludes all results in sub-queries', () => { const results = ms.search({ queries: [{ queries: ['del'], filter: () => false }] }); expect(results).toHaveLength(0) })"
+          },
+          {
+            "type": "edge-case",
+            "location": "Deeply nested queries with filters",
+            "priority": "medium",
+            "reasoning": "No test verifies filter behavior with more than two levels of query nesting",
+            "suggestedTest": "Test nested structure: { queries: [{ queries: [{ queries: ['term'], filter: f1 }], filter: f2 }], filter: f3 } to ensure filters apply at correct levels"
+          }
+        ],
+        "coverageEstimate": 60,
+        "summary": "A new test case was added that covers basic filtering in complex queries, but it only tests the happy path. Significant edge cases remain untested including error handling, empty results, and deeply nested query structures."
+      },
+      "refactorings": {
+        "file": "src/MiniSearch.test.js",
+        "suggestions": [
+          {
+            "type": "pattern-improvement",
+            "location": "Complex query filtering test (lines 1254-1269)",
+            "impact": "low",
+            "description": "Extract filter functions to named constants for better readability and reusability",
+            "before": "const results = ms.search({\n  queries: [\n    { queries: ['del'], filter: ({ category }) => category === 'poetry' },\n    { queries: ['como'], filter: ({ category }) => category === 'fiction' }\n  ]\n})",
+            "after": "const poetryFilter = ({ category }) => category === 'poetry'\nconst fictionFilter = ({ category }) => category === 'fiction'\n\nconst results = ms.search({\n  queries: [\n    { queries: ['del'], filter: poetryFilter },\n    { queries: ['como'], filter: fictionFilter }\n  ]\n})",
+            "benefits": "Improves test readability, makes filter functions reusable across multiple test cases, easier to understand test intent at a glance"
+          }
+        ],
+        "summary": "Tests are well-structured and follow existing patterns. Minor improvements possible in test data organization through extracting filter functions to named constants."
+      }
+    }
+  ],
+  "summary": {
+    "totalFiles": 2,
+    "overallScore": 75,
+    "criticalIssues": 0,
+    "highPriorityTests": 2,
+    "refactoringOpportunities": 3
+  },
+  "recommendations": [
+    {
+      "priority": "critical",
+      "category": "Testing",
+      "description": "Add comprehensive test coverage for filter composition in nested queries at multiple levels. The PR description mentions that scores may differ at different query levels, which needs explicit testing to verify filter behavior with score-dependent filters.",
+      "files": [
+        "src/MiniSearch.test.js"
+      ]
+    },
+    {
+      "priority": "critical",
+      "category": "Documentation",
+      "description": "Document the behavior that filter functions may be called multiple times per document in nested query scenarios, and that scores may differ at executeQuerySpec() level versus search() top-level. This is mentioned in the PR description as a potential breaking change.",
+      "files": [
+        "src/MiniSearch.ts"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Testing",
+      "description": "Add edge case tests including: filters that return all false (empty results), filter function error handling, undefined/null filter handling, and deeply nested queries with filters at multiple levels.",
+      "files": [
+        "src/MiniSearch.test.js"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Performance",
+      "description": "Consider and document the performance implications of calling filter functions multiple times per document. If filters are computationally expensive, consider caching filter results or documenting this limitation for users.",
+      "files": [
+        "src/MiniSearch.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Code Quality",
+      "description": "Extract filter application logic into a reusable private method (e.g., applyFilter()) to reduce code duplication between search() and executeQuerySpec() methods and improve testability.",
+      "files": [
+        "src/MiniSearch.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Testing",
+      "description": "Add integration tests to verify filter works correctly with existing features like fuzzy search, prefix search, and different combineWith operators (OR, AND, AND_NOT).",
+      "files": [
+        "src/MiniSearch.test.js"
+      ]
+    },
+    {
+      "priority": "low",
+      "category": "Code Quality",
+      "description": "Add code comments explaining why the filter option is explicitly set to undefined in executeQuerySpec to improve code clarity for future maintainers.",
+      "files": [
+        "src/MiniSearch.ts"
+      ]
+    }
+  ],
+  "metadata": {
+    "analyzedAt": "2026-09-24T00:00:00Z",
+    "duration": 598682,
+    "agentVersions": {
+      "codeQualityAnalyzer": "v1.0-sonnet-4.5",
+      "testCoverageAnalyzer": "v1.0-sonnet-4.5",
+      "refactoringSuggester": "v1.0-sonnet-4.5"
+    }
+  }
+}
