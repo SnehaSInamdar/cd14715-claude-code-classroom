@@ -58,10 +58,14 @@ async function main() {
     process.exit(1);
   }
 
-  if (!process.env.GITHUB_TOKEN) {
+  if (
+    !process.env.GITHUB_TOKEN ||
+    process.env.GITHUB_TOKEN.trim().length == 0
+  ) {
   console.error('Error: GITHUB_TOKEN environment variable is required for GitHub MCP');
-  console.error('Create a GitHub personal access token with repo/read access.');
+  console.error('Create a GitHub personal access token with repo/read access and set GITHUB_TOKEN.');
   process.exit(1);
+    return;
 }
  
 
@@ -104,6 +108,11 @@ async function main() {
   console.log(`JSON: reports/${baseName},json`);
   console.log(`Markdown: reports/${baseName}.md`);
   console.log(`HTML: reports/${baseName}.html`);
+
+  console.log('Canonical reports:');
+  console.log('JSON: reports/report.json');
+  console.log('Markdown: reports/report.json');
+  console.log('HTML: reports/report.json');
 
   if (typeof report.summary.overallScore === 'number'){
     console.log(`Overall score: ${report.summary.overallScore}/100`);
